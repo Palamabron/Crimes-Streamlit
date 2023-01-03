@@ -1,5 +1,3 @@
-import re
-
 import matplotlib.pyplot as plt
 import streamlit as st
 import pandas as pd
@@ -13,9 +11,6 @@ from sklearn.decomposition import PCA
 import plotly.express as px
 from sklearn.impute import SimpleImputer
 import plotly.graph_objs as go
-from plotly.offline import iplot
-import json
-from pandas.io.json import json_normalize
 
 
 def highlight_cells(s: pd.Series, true_css: str, false_css: str = '') -> np.ndarray:
