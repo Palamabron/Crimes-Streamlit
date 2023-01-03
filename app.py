@@ -9,12 +9,12 @@ import ModelAnalysis
 
 @st.cache(allow_output_mutation=True)
 def load_models():
-    et = load(r'D:\PythonProjects\streamlit\crimes\manualModels\m_et.joblib')
-    gbr = load(r'D:\PythonProjects\streamlit\crimes\manualModels\m_gbr.joblib')
-    huber = load(r'D:\PythonProjects\streamlit\crimes\manualModels\m_huber.joblib')
-    lightgbm = load(r'D:\PythonProjects\streamlit\crimes\manualModels\m_lightgbm.joblib')
-    rf = load(r'D:\PythonProjects\streamlit\crimes\manualModels\m_rf.joblib')
-    stack = load(r'D:\PythonProjects\streamlit\crimes\manualModels\m_stack.joblib')
+    et = load(r'm_et.joblib')
+    gbr = load(r'm_gbr.joblib')
+    huber = load(r'm_huber.joblib')
+    lightgbm = load(r'm_lightgbm.joblib')
+    rf = load(r'm_rf.joblib')
+    stack = load(r'm_stack.joblib')
     return et, gbr, huber, lightgbm, rf, stack
 
 
