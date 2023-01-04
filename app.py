@@ -7,14 +7,15 @@ import LivePrediction
 import ModelAnalysis
 
 
+
 @st.cache(allow_output_mutation=True)
 def load_models():
-    et = load(r'm_et.joblib')
-    gbr = load(r'm_gbr.joblib')
-    huber = load(r'm_huber.joblib')
-    lightgbm = load(r'm_lightgbm.joblib')
-    rf = load(r'm_rf.joblib')
-    stack = load(r'm_stack.joblib')
+    et = load('m_et.joblib')
+    gbr = load('m_gbr.joblib')
+    huber = load('m_huber.joblib')
+    lightgbm = load('m_lightgbm.joblib')
+    rf = load('m_rf.joblib')
+    stack = load('m_stack.joblib')
     return et, gbr, huber, lightgbm, rf, stack
 
 
