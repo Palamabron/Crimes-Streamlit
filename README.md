@@ -1,6 +1,6 @@
 ### [OPEN THE APP](https://palamabron-crimes-streamlit-app-tzgm1x.streamlit.app)
 ## TO DO:
- - [ ] Code training and HPO snippets
+ - [ ] training and HPO code snippets
  - [ ] Descriptions
  - [ ] Better columns' names
  - [ ] Add link to data
