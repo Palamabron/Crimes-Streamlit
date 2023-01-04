@@ -7,7 +7,6 @@ import LivePrediction
 import ModelAnalysis
 
 
-
 @st.cache(allow_output_mutation=True)
 def load_models():
     et = load('m_et.joblib')
