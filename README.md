@@ -1,4 +1,4 @@
-[Link to the app](https://palamabron-crimes-streamlit-app-tzgm1x.streamlit.app)
+### [OPEN THE APP](https://palamabron-crimes-streamlit-app-tzgm1x.streamlit.app)
 ## TO DO:
  - [ ] Code training and HPO snippets
  - [ ] Descriptions
