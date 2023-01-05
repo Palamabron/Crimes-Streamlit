@@ -70,40 +70,52 @@ def data_analysis_page():
         "Data Analysis",
         ("Preprocessed", "Processed")
     )
+
+    rawData, processed_data = load_data()
+    if data_sidebar == "Preprocessed":
+        preprocessed_page(rawData)
+    else:
+        processed_page(processed_data)
+
+
+def preprocessed_page(data):
+    st.write("# Data Source")
+    st.write()
+    st.write("# Data Description")
     target = [
         'murders', 'murdPerPop', 'rapes', 'rapesPerPop', 'robberies', 'robbbPerPop',
         'assaults', 'assaultPerPop', 'burglaries', 'burglPerPop', 'larcenies',
         'larcPerPop', 'autoTheft', 'autoTheftPerPop', 'arsons', 'arsonsPerPop',
         'ViolentCrimesPerPop', 'nonViolPerPop'
     ]
-    rawData, processed_data = load_data()
-    primarilyPreData = prepare_data(rawData)
-    styledData = rawData.head(50).copy()
+    primarilyPreData = prepare_data(data)
+    styledData = data.head(50).copy()
     numeric_columns = styledData.select_dtypes(include=[np.float]).columns.tolist()
-    if data_sidebar == "Preprocessed":
-        st.dataframe(styledData.style.apply(highlight_cells, true_css='color:green', false_css='color:red',
-                                            subset=target).format(subset=numeric_columns, formatter="{:.2f}"))
-        geoPlot(rawData)
-        corr_plot(primarilyPreData)
-        most_corr_df(primarilyPreData)
-        get_vif_scores(primarilyPreData)
-        pca_plot(primarilyPreData)
-        tSNE_plot(primarilyPreData)
-    else:
-        st.write("After processing")
-        numeric_columns = processed_data.select_dtypes(include=[np.float]).columns.tolist()
-        styledData = processed_data.head(50).sort_index(ascending=True).copy()
-        st.dataframe(
-            styledData.style
-            .apply(highlight_cells, true_css='color:green', false_css='color:red',
-                   subset=['ViolentCrimesPerPop'])
-            .format(subset=numeric_columns, formatter="{:.2f}")
-        )
-        corr_plot(processed_data)
-        most_corr_df(processed_data)
-        get_vif_scores(processed_data)
-        pca_plot(processed_data)
-        tSNE_plot(processed_data)
+    st.dataframe(styledData.style.apply(highlight_cells, true_css='color:green', false_css='color:red',
+                                        subset=target).format(subset=numeric_columns, formatter="{:.2f}"))
+    geoPlot(data)
+    corr_plot(primarilyPreData)
+    most_corr_df(primarilyPreData)
+    get_vif_scores(primarilyPreData)
+    pca_plot(primarilyPreData)
+    tSNE_plot(primarilyPreData)
+
+
+def processed_page(data):
+    st.write("After processing")
+    numeric_columns = data.select_dtypes(include=[np.float]).columns.tolist()
+    styledData = data.head(50).sort_index(ascending=True).copy()
+    st.dataframe(
+        styledData.style
+        .apply(highlight_cells, true_css='color:green', false_css='color:red',
+               subset=['ViolentCrimesPerPop'])
+        .format(subset=numeric_columns, formatter="{:.2f}")
+    )
+    corr_plot(data)
+    most_corr_df(data)
+    get_vif_scores(data)
+    pca_plot(data)
+    tSNE_plot(data)
 
 
 def corr_plot(df):
@@ -121,8 +133,7 @@ def pca_plot(df):
     components = pca.fit_transform(features)
 
     total_var = pca.explained_variance_ratio_.sum() * 100
-    # labels = {str(i): f"PC {i + 1}" for i in range(n_components)}
-    # labels['color'] = 'ViolentCrimesPerPop'
+
     fig = px.scatter_3d(
         components, x=0, y=1, z=2,
         color=df.ViolentCrimesPerPop,
@@ -130,7 +141,6 @@ def pca_plot(df):
         title=f'Total Explained Variance: {total_var:.2f}%',
         color_continuous_scale=px.colors.sequential.Sunset
     )
-    # fig.update_traces(diagonal_visible=False)
     st.plotly_chart(fig, theme="streamlit", use_container_width=True)
 
     n_components = 2
@@ -178,7 +188,6 @@ def most_corr_df(df):
     unique_corr_pairs = upper_corr_mat.unstack().dropna()
     sorted_mat = unique_corr_pairs.sort_values(kind='quicksort', ascending=False).head(20)
     result = pd.DataFrame(sorted_mat)
-    # print(result.columns.values)
     result.rename(columns={0: "correlation"}, inplace=True)
     st.dataframe(result)
     result = pd.DataFrame(unique_corr_pairs.sort_values(kind='quicksort', ascending=False).loc[lambda x: (x > 0.9)])
@@ -198,7 +207,6 @@ def geoPlot(df):
     df_state = df.groupby('state').agg({'ViolentCrimesPerPop': 'mean', 'nonViolPerPop': 'mean'})[
         ['ViolentCrimesPerPop', 'nonViolPerPop']].reset_index()
     df_state = df_state.fillna(0)
-    # print(df_state)
     # Aggregate view of Non-Violent Crimes by State
     data1 = dict(type='choropleth',
                  colorscale='Viridis',

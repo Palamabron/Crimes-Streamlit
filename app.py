@@ -9,12 +9,13 @@ import ModelAnalysis
 
 @st.cache(allow_output_mutation=True)
 def load_models():
-    et = load('m_et.joblib')
-    gbr = load('m_gbr.joblib')
-    huber = load('m_huber.joblib')
-    lightgbm = load('m_lightgbm.joblib')
-    rf = load('m_rf.joblib')
-    stack = load('m_stack.joblib')
+    customPath = r''
+    et = load(customPath + 'm_et.joblib')
+    gbr = load(customPath + 'm_gbr.joblib')
+    huber = load(customPath + 'm_huber.joblib')
+    lightgbm = load(customPath + 'm_lightgbm.joblib')
+    rf = load(customPath + 'm_rf.joblib')
+    stack = load(customPath + 'm_stack.joblib')
     return et, gbr, huber, lightgbm, rf, stack
 
 
@@ -25,12 +26,12 @@ def run():
         key=1
     )
 
-    et, gbr, huber, lightgbm, rf, stack = load_models()
+    models = load_models()
 
     if menu_sidebar == "Live Prediction":
-        LivePrediction.live_prediction_page(et, gbr, huber, lightgbm, rf, stack)
+        LivePrediction.live_prediction_page(models)
     elif menu_sidebar == "Models analysis":
-        ModelAnalysis.models_analysis_page(et, gbr, huber, lightgbm, rf, stack)
+        ModelAnalysis.models_analysis_page(models)
     else:
         DataAnalysis.data_analysis_page()
 

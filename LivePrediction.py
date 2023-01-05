@@ -4,54 +4,19 @@ import pandas as pd
 from ModelAnalysis import load_data
 
 
-def user_input_features(et, gbr, huber, lightgbm, rf, stack, X_train, y_train, features):
-    PctKids2Par = st.slider("PctKids2Par", float(X_train["PctKids2Par"].min()),
-                            float(X_train["PctKids2Par"].max()), float(X_train["PctKids2Par"].mean()),
-                            on_change=get_predictions, key="PctKids2Par",
-                            args=(et, gbr, huber, lightgbm, rf, stack, X_train, y_train, features), step=0.1)
-    PctKidsBornNeverMar = st.slider("PctKidsBornNeverMar", float(X_train["PctKidsBornNeverMar"].min()),
-                                    float(X_train["PctKidsBornNeverMar"].max()),
-                                    float(X_train["PctKidsBornNeverMar"].mean()),
-                                    on_change=get_predictions, key="PctKidsBornNeverMar",
-                                    args=(et, gbr, huber, lightgbm, rf, stack, X_train, y_train, features), step=0.1)
-    racePctWhite = st.slider("racePctWhite", float(X_train["racePctWhite"].min()),
-                             float(X_train["racePctWhite"].max()), float(X_train["racePctWhite"].mean()),
-                             on_change=get_predictions, key="racePctWhite",
-                             args=(et, gbr, huber, lightgbm, rf, stack, X_train, y_train, features), step=0.1)
-    NumKidsBornNeverMar = st.slider("NumKidsBornNeverMar", float(X_train["NumKidsBornNeverMar"].min()),
-                                    float(X_train["NumKidsBornNeverMar"].max()),
-                                    float(X_train["NumKidsBornNeverMar"].mean()),
-                                    on_change=get_predictions, key="NumKidsBornNeverMar",
-                                    args=(et, gbr, huber, lightgbm, rf, stack, X_train, y_train, features), step=0.1)
-    racepctblack = st.slider("racepctblack", float(X_train["racepctblack"].min()),
-                             float(X_train["racepctblack"].max()), float(X_train["racepctblack"].mean()),
-                             on_change=get_predictions, key="racepctblack",
-                             args=(et, gbr, huber, lightgbm, rf, stack, X_train, y_train, features), step=0.1)
-    pctWInvInc = st.slider("pctWInvInc", float(X_train["pctWInvInc"].min()),
-                           float(X_train["pctWInvInc"].max()), float(X_train["pctWInvInc"].mean()),
-                           on_change=get_predictions, key="pctWInvInc",
-                           args=(et, gbr, huber, lightgbm, rf, stack, X_train, y_train, features), step=0.1)
-    PctTeen2Par = st.slider("PctTeen2Par", float(X_train["PctTeen2Par"].min()),
-                            float(X_train["PctTeen2Par"].max()), float(X_train["PctTeen2Par"].mean()),
-                            on_change=get_predictions, key="PctTeen2Par",
-                            args=(et, gbr, huber, lightgbm, rf, stack, X_train, y_train, features), step=0.1)
-    # for column in features:
-    #     inputs[column] = st.slider(column, float(X_train[column].min()),
-    #                                float(X_train[column].max()), float(X_train[column].mean()),
-    #                                on_change=get_predictions, key=str(i),
-    #                                args=(et, gbr, huber, lightgbm, rf, stack, X_train, y_train, features), step=0.1)
-    #     i += 1
+def user_input_features(sliders):
     inputs = {
-        "PctKids2Par": PctKids2Par,
-        "PctKidsBornNeverMar": PctKidsBornNeverMar,
-        "racePctWhite": racePctWhite,
-        "NumKidsBornNeverMar": NumKidsBornNeverMar,
-        "racepctblack": racepctblack,
-        "pctWInvInc": pctWInvInc,
-        "PctTeen2Par": PctTeen2Par
+        "PctKids2Par": sliders[0],
+        "PctKidsBornNeverMar": sliders[1],
+        "racePctWhite": sliders[2],
+        "NumKidsBornNeverMar": sliders[3],
+        "racepctblack": sliders[4],
+        "pctWInvInc": sliders[5],
+        "PctTeen2Par": sliders[6]
     }
     features = pd.DataFrame(inputs, index=[0])
     return features
+
 
 @st.cache
 def get_most_imported_features(model, X_train, y_train):
@@ -61,7 +26,6 @@ def get_most_imported_features(model, X_train, y_train):
         feature_importance.append((model.feature_names_in_[i], model.feature_importances_[i]))
     feature_importance.sort(key=lambda x: x[1])
     result = [feature[0] for feature in feature_importance]
-    # st.write(f"{feature_importance}")
     return result[:8]
 
 
@@ -73,9 +37,8 @@ def get_columns_average(X_train):
     return avg_pd
 
 
-def get_predictions(et, gbr, huber, lightgbm, rf, stack, X_train, y_train, features):
-    input_df = user_input_features(et, gbr, huber, lightgbm, rf, stack, X_train, y_train, features)
-
+def get_predictions(models, X_train, sliders):
+    input_df = user_input_features(sliders)
     result_pd = get_columns_average(X_train)
     for col in input_df.columns:
         result_pd[col] = input_df[col]
@@ -83,34 +46,55 @@ def get_predictions(et, gbr, huber, lightgbm, rf, stack, X_train, y_train, featu
     st.dataframe(result_pd.T)
 
     st.write("# Prediction:")
-    pred_dict = dict()
+    predictionDict = dict()
 
-    et_pred = et.predict(result_pd)
-    pred_dict["Extra Trees"] = et_pred
+    etPredictions = models[0].predict(result_pd)
+    predictionDict["Extra Trees"] = etPredictions
 
-    gbr_pred = gbr.predict(result_pd)
-    pred_dict["Gradient Boosting"] = gbr_pred
+    gbrPredictions = models[1].predict(result_pd)
+    predictionDict["Gradient Boosting"] = gbrPredictions
 
-    huber_pred = huber.predict(result_pd)
-    pred_dict["Huber"] = huber_pred
+    huberPredictions = models[2].predict(result_pd)
+    predictionDict["Huber"] = huberPredictions
 
-    lightgbm_pred = lightgbm.predict(result_pd)
-    pred_dict["Gradient Boosting"] = lightgbm_pred
+    lightgbmPredictions = models[3].predict(result_pd)
+    predictionDict["Gradient Boosting"] = lightgbmPredictions
 
-    rf_pred = rf.predict(result_pd)
-    pred_dict["Random Forest"] = rf_pred
+    rfPredictions = models[4].predict(result_pd)
+    predictionDict["Random Forest"] = rfPredictions
 
-    stack_pred = stack.predict(result_pd)
-    pred_dict["Stacking"] = stack_pred
+    stackPredictions = models[5].predict(result_pd)
+    predictionDict["Stacking"] = stackPredictions
 
-    pred_df = pd.DataFrame(pred_dict)
-    style = pred_df.style.hide_index()
+    prediction_df = pd.DataFrame(predictionDict)
+    style = prediction_df.style.hide_index()
     st.write(style.to_html(), unsafe_allow_html=True)
-    # st.dataframe(pred_df)
 
 
-def live_prediction_page(et, gbr, huber, lightgbm, rf, stack):
+def live_prediction_page(models):
     X_train, y_train, X_test, y_test = load_data()
-    most_imported_features = get_most_imported_features(et, X_train, y_train)
-    # st.write(f"{most_imported_features}")
-    get_predictions(et, gbr, huber, lightgbm, rf, stack, X_train, y_train, most_imported_features)
+    PctKids2Par = st.slider("PctKids2Par", float(X_train["PctKids2Par"].min()),
+                            float(X_train["PctKids2Par"].max()), float(X_train["PctKids2Par"].mean()),
+                            key="PctKids2Par", step=0.1)
+    PctKidsBornNeverMar = st.slider("PctKidsBornNeverMar", float(X_train["PctKidsBornNeverMar"].min()),
+                                    float(X_train["PctKidsBornNeverMar"].max()),
+                                    float(X_train["PctKidsBornNeverMar"].mean()),
+                                    key="PctKidsBornNeverMar", step=0.1)
+    racePctWhite = st.slider("racePctWhite", float(X_train["racePctWhite"].min()),
+                             float(X_train["racePctWhite"].max()), float(X_train["racePctWhite"].mean()),
+                             key="racePctWhite", step=0.1)
+    NumKidsBornNeverMar = st.slider("NumKidsBornNeverMar", float(X_train["NumKidsBornNeverMar"].min()),
+                                    float(X_train["NumKidsBornNeverMar"].max()),
+                                    float(X_train["NumKidsBornNeverMar"].mean()),
+                                    key="NumKidsBornNeverMar", step=0.1)
+    racepctblack = st.slider("racepctblack", float(X_train["racepctblack"].min()),
+                             float(X_train["racepctblack"].max()), float(X_train["racepctblack"].mean()),
+                             key="racepctblack", step=0.1)
+    pctWInvInc = st.slider("pctWInvInc", float(X_train["pctWInvInc"].min()),
+                           float(X_train["pctWInvInc"].max()), float(X_train["pctWInvInc"].mean()),
+                           key="pctWInvInc", step=0.1)
+    PctTeen2Par = st.slider("PctTeen2Par", float(X_train["PctTeen2Par"].min()),
+                            float(X_train["PctTeen2Par"].max()), float(X_train["PctTeen2Par"].mean()),
+                            key="PctTeen2Par", step=0.1)
+    sliders = [PctKids2Par, PctKidsBornNeverMar, racePctWhite, NumKidsBornNeverMar, racepctblack, pctWInvInc, PctTeen2Par]
+    get_predictions(models, X_train, sliders)
